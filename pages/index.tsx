@@ -25,17 +25,18 @@ export default function Home() {
       setLoading(true);
       setConvActive(true);
 
-      const response = await fetch("/api/chat", {
+      const BASE_URL = process.env.NEXT_PUBLIC_REACT_APP_SERVER_URL
+      const PATH = model === LLM.GPT_3_5 ? '/chat' : '/chat'
+      const POST_URL = BASE_URL + PATH
+
+      const response = await fetch(POST_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          model,
-          messages: updatedConversation.messages
-        })
+        body: JSON.stringify(updatedConversation.messages)
       });
-
+      console.log(POST_URL)
       if (!response.ok) {
         setLoading(false);
         throw new Error(response.statusText);
