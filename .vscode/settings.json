@@ -12,7 +12,7 @@
         "statusBar.debuggingForeground": "#FEFAFF",
         "statusBar.noFolderBackground": "#050856",
         "statusBar.noFolderForeground": "#FEFAFF",
-        "editor.background": "#240350",
+        "editor.background": "#1e053d",
         //"editor.foreground": "#1e062a",
         "editorLineNumber.foreground": "#FEFAFF",
         "editorLineNumber.activeForeground": "#FEFAFF",

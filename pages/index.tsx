@@ -1,6 +1,7 @@
 import { ConversationPage } from "@/components/conversation/";
 import { SideNavbar } from "@/components/sidenavbar";
-import { Conversation, ConversationMsg, LLM } from "@/typings";
+import { SendConversation } from "@/functions/conversation/handleSend";
+import { Conversation, ConversationMsg, LLM, LocalStKeys } from "@/typings";
 import { IconArrowBarRight } from "@tabler/icons-react";
 import Head from "next/head";
 import { useEffect, useState } from "react";
@@ -14,62 +15,73 @@ export default function Home() {
   const [convActive, setConvActive] = useState<boolean>(false);
   const [showSidebar, setShowSidebar] = useState<boolean>(true);
 
+  // When you send a prompt to the model during a conversation
   const handleSend = async (message: ConversationMsg) => {
-    if (selectedConversation) {
-      let updatedConversation: Conversation = {
-        ...selectedConversation,
-        messages: [...selectedConversation.messages, message]
-      };
-
-      setSelectedConversation(updatedConversation);
-      setLoading(true);
-      setConvActive(true);
-
-      const BASE_URL = process.env.NEXT_PUBLIC_REACT_APP_SERVER_URL
-      const PATH = model === LLM.GPT_3_5 ? '/chat' : '/chat'
-      const POST_URL = BASE_URL + PATH
-
-      let newPrompt = updatedConversation.messages.map((m) => m.msg).join(" ");
-
-
-      const response = await fetch(POST_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: newPrompt
-      });
-      console.log(POST_URL)
-      if (!response.ok) {
-        setLoading(false);
-        throw new Error(response.statusText);
-      }
-
-      const data = response.json();
-
-      if (!data) {
-        return;
-      }
-
-      setLoading(false);
-
-
-      const updatedMessages: ConversationMsg[] = updatedConversation.messages
-      updatedMessages.push({
-        role: "assistant",
-        msg: await data
-      });
-
-      updatedConversation = {
-        ...updatedConversation,
-        messages: updatedMessages
-      };
-
-      setSelectedConversation(updatedConversation);
-      localStorage.setItem("selectedConversation", JSON.stringify(updatedConversation));
-      setConvActive(false);
-    }
+    SendConversation(
+      message,
+      model,
+      selectedConversation,
+      setSelectedConversation,
+      setLoading,
+      setConvActive,
+    )
   };
+  /*  const handleSend = async (message: ConversationMsg) => {
+     if (selectedConversation) {
+       let updatedConversation: Conversation = {
+         ...selectedConversation,
+         messages: [...selectedConversation.messages, message]
+       };
+ 
+       setSelectedConversation(updatedConversation);
+       setLoading(true);
+       setConvActive(true);
+ 
+       const BASE_URL = process.env.NEXT_PUBLIC_REACT_APP_SERVER_URL
+       const PATH = model === LLM.GPT_3_5 ? '/chat' : '/chat'
+       const POST_URL = BASE_URL + PATH
+ 
+       let newPrompt = updatedConversation.messages.map((m) => m.msg).join(" ");
+ 
+ 
+       const response = await fetch(POST_URL, {
+         method: "POST",
+         headers: {
+           "Content-Type": "application/json"
+         },
+         body: newPrompt
+       });
+       console.log(POST_URL)
+       if (!response.ok) {
+         setLoading(false);
+         throw new Error(response.statusText);
+       }
+ 
+       const data = response.json();
+ 
+       if (!data) {
+         return;
+       }
+ 
+       setLoading(false);
+ 
+ 
+       const updatedMessages: ConversationMsg[] = updatedConversation.messages
+       updatedMessages.push({
+         role: "assistant",
+         msg: await data
+       });
+ 
+       updatedConversation = {
+         ...updatedConversation,
+         messages: updatedMessages
+       };
+ 
+       setSelectedConversation(updatedConversation);
+       localStorage.setItem(LocalStKeys.SELECTED_CONV, JSON.stringify(updatedConversation));
+       setConvActive(false);
+     }
+   }; */
 
   const handleDarkMode = () => {
     let newMode: boolean = true
@@ -78,7 +90,7 @@ export default function Home() {
       setDarkMode(!darkMode)
     }
     else setDarkMode(true)
-    localStorage.setItem("darkMode", String(newMode));
+    localStorage.setItem(LocalStKeys.DARK_MODE, String(newMode));
   };
 
   const handleRenameConversation = (conversation: Conversation, name: string) => {
@@ -96,12 +108,13 @@ export default function Home() {
     });
 
     setConversations(updatedConversations);
-    localStorage.setItem("conversationHistory", JSON.stringify(updatedConversations));
+    localStorage.setItem(LocalStKeys.CONV_HISTORY, JSON.stringify(updatedConversations));
 
     setSelectedConversation(updatedConversation);
-    localStorage.setItem("selectedConversation", JSON.stringify(updatedConversation));
+    localStorage.setItem(LocalStKeys.SELECTED_CONV, JSON.stringify(updatedConversation));
   };
 
+  //When you start a new conversation
   const handleNewConversation = () => {
     const lastConversation = conversations[conversations.length - 1];
 
@@ -113,35 +126,37 @@ export default function Home() {
 
     const updatedConversations = [...conversations, newConversation];
     setConversations(updatedConversations);
-    localStorage.setItem("conversationHistory", JSON.stringify(updatedConversations));
+    localStorage.setItem(LocalStKeys.CONV_HISTORY, JSON.stringify(updatedConversations));
 
     setSelectedConversation(newConversation);
-    localStorage.setItem("selectedConversation", JSON.stringify(newConversation));
+    localStorage.setItem(LocalStKeys.SELECTED_CONV, JSON.stringify(newConversation));
 
     setModel(LLM.GPT_3_5);
     setLoading(false);
   };
 
+  // When you select a conversation from the sidebar
   const handleSelectConversation = (conversation: Conversation) => {
     setSelectedConversation(conversation);
-    localStorage.setItem("selectedConversation", JSON.stringify(conversation));
+    localStorage.setItem(LocalStKeys.SELECTED_CONV, JSON.stringify(conversation));
   };
 
+  // When you delete a conversation from the sidebar
   const handleDeleteConversation = (conversation: Conversation) => {
     const updatedConversations = conversations.filter((c) => c.id !== conversation.id);
     setConversations(updatedConversations);
-    localStorage.setItem("conversationHistory", JSON.stringify(updatedConversations));
+    localStorage.setItem(LocalStKeys.CONV_HISTORY, JSON.stringify(updatedConversations));
 
     if (updatedConversations.length > 0) {
       setSelectedConversation(updatedConversations[0]);
-      localStorage.setItem("selectedConversation", JSON.stringify(updatedConversations[0]));
+      localStorage.setItem(LocalStKeys.SELECTED_CONV, JSON.stringify(updatedConversations[0]));
     } else {
       setSelectedConversation({
         id: 1,
         name: "",
         messages: []
       });
-      localStorage.removeItem("selectedConversation");
+      localStorage.removeItem(LocalStKeys.SELECTED_CONV);
     }
   };
 
@@ -154,13 +169,13 @@ export default function Home() {
       setDarkMode(false);
     }
 
-    const conversationHistory = localStorage.getItem("conversationHistory");
+    const conversationHistory = localStorage.getItem(LocalStKeys.CONV_HISTORY);
 
     if (conversationHistory) {
       setConversations(JSON.parse(conversationHistory));
     }
 
-    const selectedConversation = localStorage.getItem("selectedConversation");
+    const selectedConversation = localStorage.getItem(LocalStKeys.SELECTED_CONV);
     if (selectedConversation) {
       setSelectedConversation(JSON.parse(selectedConversation));
     } else {
