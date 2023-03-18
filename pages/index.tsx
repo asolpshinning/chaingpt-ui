@@ -29,12 +29,15 @@ export default function Home() {
       const PATH = model === LLM.GPT_3_5 ? '/chat' : '/chat'
       const POST_URL = BASE_URL + PATH
 
+      let newPrompt = updatedConversation.messages.map((m) => m.msg).join(" ");
+
+
       const response = await fetch(POST_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(updatedConversation.messages)
+        body: newPrompt
       });
       console.log(POST_URL)
       if (!response.ok) {
@@ -42,7 +45,7 @@ export default function Home() {
         throw new Error(response.statusText);
       }
 
-      const data = response.body;
+      const data = response.json();
 
       if (!data) {
         return;
@@ -50,76 +53,32 @@ export default function Home() {
 
       setLoading(false);
 
-      const reader = data.getReader();
-      const decoder = new TextDecoder();
-      let done = false;
-      let isFirst = true;
-      let text = "";
 
-      while (!done) {
-        const { value, done: doneReading } = await reader.read();
-        done = doneReading;
-        const chunkValue = decoder.decode(value);
-
-        text += chunkValue;
-
-        if (isFirst) {
-          isFirst = false;
-          const updatedMessages: ConversationMsg[] = [...updatedConversation.messages, { role: "assistant", msg: chunkValue }];
-
-          updatedConversation = {
-            ...updatedConversation,
-            messages: updatedMessages
-          };
-
-          setSelectedConversation(updatedConversation);
-        } else {
-          const updatedMessages: ConversationMsg[] = updatedConversation.messages.map((message, index) => {
-            if (index === updatedConversation.messages.length - 1) {
-              return {
-                ...message,
-                content: text
-              };
-            }
-
-            return message;
-          });
-
-          updatedConversation = {
-            ...updatedConversation,
-            messages: updatedMessages
-          };
-
-          setSelectedConversation(updatedConversation);
-        }
-      }
-
-      localStorage.setItem("selectedConversation", JSON.stringify(updatedConversation));
-
-      const updatedConversations: Conversation[] = conversations.map((conversation) => {
-        if (conversation.id === selectedConversation.id) {
-          return updatedConversation;
-        }
-
-        return conversation;
+      const updatedMessages: ConversationMsg[] = updatedConversation.messages
+      updatedMessages.push({
+        role: "assistant",
+        msg: await data
       });
 
-      if (updatedConversations.length === 0) {
-        updatedConversations.push(updatedConversation);
-      }
+      updatedConversation = {
+        ...updatedConversation,
+        messages: updatedMessages
+      };
 
-      setConversations(updatedConversations);
-
-      localStorage.setItem("conversationHistory", JSON.stringify(updatedConversations));
-
+      setSelectedConversation(updatedConversation);
+      localStorage.setItem("selectedConversation", JSON.stringify(updatedConversation));
       setConvActive(false);
     }
   };
 
   const handleDarkMode = () => {
-    if (darkMode) setDarkMode(false)
+    let newMode: boolean = true
+    if (darkMode) {
+      newMode = false
+      setDarkMode(!darkMode)
+    }
     else setDarkMode(true)
-    localStorage.setItem("darkMode", String(darkMode));
+    localStorage.setItem("darkMode", String(newMode));
   };
 
   const handleRenameConversation = (conversation: Conversation, name: string) => {
@@ -188,6 +147,7 @@ export default function Home() {
 
   useEffect(() => {
     const colorMode = localStorage.getItem("darkMode");
+    console.log("colorMode: ", colorMode)
     if (colorMode == "true") {
       setDarkMode(true);
     } else {
