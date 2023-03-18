@@ -42,7 +42,7 @@ export const Conversations: FC<Props> = ({ loading, conversations, selectedConve
             {conversations.map((conversation, index) => (
                 <button
                     key={index}
-                    className={`flex items-center justify-start min-h-[40px] px-2 text-sm rounded-lg hover:bg-neutral-700 cursor-pointer ${loading ? "disabled:cursor-not-allowed" : ""} ${selectedConversation.id === conversation.id ? "bg-slate-600" : ""}`}
+                    className={`flex items-center justify-start min-h-[40px] px-2 text-sm rounded-lg hover:bg-neutral-700 cursor-pointer ${loading ? "disabled:cursor-not-allowed" : ""} ${selectedConversation.id === conversation?.id ? "bg-slate-600" : ""}`}
                     onClick={() => onSelectConversation(conversation)}
                     disabled={loading}
                 >
@@ -51,7 +51,7 @@ export const Conversations: FC<Props> = ({ loading, conversations, selectedConve
                         size={18}
                     />
 
-                    {isRenaming && selectedConversation.id === conversation.id ? (
+                    {isRenaming && selectedConversation.id === conversation?.id ? (
                         <input
                             className="flex-1 bg-transparent border-b border-neutral-400 focus:border-neutral-100 text-left overflow-hidden overflow-ellipsis pr-1 outline-none text-white"
                             type="text"
@@ -61,10 +61,10 @@ export const Conversations: FC<Props> = ({ loading, conversations, selectedConve
                             autoFocus
                         />
                     ) : (
-                        <div className="overflow-hidden whitespace-nowrap overflow-ellipsis pr-1 flex-1 text-left">{conversation.name}</div>
+                        <div className="overflow-hidden whitespace-nowrap overflow-ellipsis pr-1 flex-1 text-left">{conversation?.name}</div>
                     )}
 
-                    {(isDeleting || isRenaming) && selectedConversation.id === conversation.id && (
+                    {(isDeleting || isRenaming) && selectedConversation.id === conversation?.id && (
                         <div className="flex w-[40px]">
                             <IconCheck
                                 className="ml-auto min-w-[20px] text-neutral-400 hover:text-neutral-100"
@@ -95,7 +95,7 @@ export const Conversations: FC<Props> = ({ loading, conversations, selectedConve
                         </div>
                     )}
 
-                    {selectedConversation.id === conversation.id && !isDeleting && !isRenaming && (
+                    {selectedConversation.id === conversation?.id && !isDeleting && !isRenaming && (
                         <div className="flex w-[40px]">
                             <IconPencil
                                 className="min-w-[20px] text-neutral-400 hover:text-neutral-100"

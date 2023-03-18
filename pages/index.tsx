@@ -1,6 +1,10 @@
 import { ConversationPage } from "@/components/conversation/";
 import { SideNavbar } from "@/components/sidenavbar";
+import { deleteConversation } from "@/functions/conversation/handleDeleteConv";
+import { startNewConversation } from "@/functions/conversation/handleNewConv";
+import { renameConversation } from "@/functions/conversation/handleRename";
 import { SendConversation } from "@/functions/conversation/handleSend";
+import { useEffectFunc } from "@/functions/conversation/handleUseEffect";
 import { Conversation, ConversationMsg, LLM, LocalStKeys } from "@/typings";
 import { IconArrowBarRight } from "@tabler/icons-react";
 import Head from "next/head";
@@ -26,62 +30,6 @@ export default function Home() {
       setConvActive,
     )
   };
-  /*  const handleSend = async (message: ConversationMsg) => {
-     if (selectedConversation) {
-       let updatedConversation: Conversation = {
-         ...selectedConversation,
-         messages: [...selectedConversation.messages, message]
-       };
- 
-       setSelectedConversation(updatedConversation);
-       setLoading(true);
-       setConvActive(true);
- 
-       const BASE_URL = process.env.NEXT_PUBLIC_REACT_APP_SERVER_URL
-       const PATH = model === LLM.GPT_3_5 ? '/chat' : '/chat'
-       const POST_URL = BASE_URL + PATH
- 
-       let newPrompt = updatedConversation.messages.map((m) => m.msg).join(" ");
- 
- 
-       const response = await fetch(POST_URL, {
-         method: "POST",
-         headers: {
-           "Content-Type": "application/json"
-         },
-         body: newPrompt
-       });
-       console.log(POST_URL)
-       if (!response.ok) {
-         setLoading(false);
-         throw new Error(response.statusText);
-       }
- 
-       const data = response.json();
- 
-       if (!data) {
-         return;
-       }
- 
-       setLoading(false);
- 
- 
-       const updatedMessages: ConversationMsg[] = updatedConversation.messages
-       updatedMessages.push({
-         role: "assistant",
-         msg: await data
-       });
- 
-       updatedConversation = {
-         ...updatedConversation,
-         messages: updatedMessages
-       };
- 
-       setSelectedConversation(updatedConversation);
-       localStorage.setItem(LocalStKeys.SELECTED_CONV, JSON.stringify(updatedConversation));
-       setConvActive(false);
-     }
-   }; */
 
   const handleDarkMode = () => {
     let newMode: boolean = true
@@ -93,7 +41,17 @@ export default function Home() {
     localStorage.setItem(LocalStKeys.DARK_MODE, String(newMode));
   };
 
+  // handle rename conversation
   const handleRenameConversation = (conversation: Conversation, name: string) => {
+    renameConversation(
+      conversation,
+      name,
+      conversations,
+      setConversations,
+      setSelectedConversation,
+    )
+  };
+  /* const handleRenameConversation = (conversation: Conversation, name: string) => {
     const updatedConversation = {
       ...conversation,
       name
@@ -112,10 +70,19 @@ export default function Home() {
 
     setSelectedConversation(updatedConversation);
     localStorage.setItem(LocalStKeys.SELECTED_CONV, JSON.stringify(updatedConversation));
-  };
+  }; */
 
   //When you start a new conversation
   const handleNewConversation = () => {
+    startNewConversation(
+      conversations,
+      setConversations,
+      setSelectedConversation,
+      setModel,
+      setLoading,
+    )
+  }
+  /* const handleNewConversation = () => {
     const lastConversation = conversations[conversations.length - 1];
 
     const newConversation: Conversation = {
@@ -133,7 +100,7 @@ export default function Home() {
 
     setModel(LLM.GPT_3_5);
     setLoading(false);
-  };
+  }; */
 
   // When you select a conversation from the sidebar
   const handleSelectConversation = (conversation: Conversation) => {
@@ -143,6 +110,14 @@ export default function Home() {
 
   // When you delete a conversation from the sidebar
   const handleDeleteConversation = (conversation: Conversation) => {
+    deleteConversation(
+      conversation,
+      conversations,
+      setConversations,
+      setSelectedConversation,
+    )
+  }
+  /* const handleDeleteConversation = (conversation: Conversation) => {
     const updatedConversations = conversations.filter((c) => c.id !== conversation.id);
     setConversations(updatedConversations);
     localStorage.setItem(LocalStKeys.CONV_HISTORY, JSON.stringify(updatedConversations));
@@ -158,33 +133,15 @@ export default function Home() {
       });
       localStorage.removeItem(LocalStKeys.SELECTED_CONV);
     }
-  };
+  }; */
 
+  // When the page loads
   useEffect(() => {
-    const colorMode = localStorage.getItem("darkMode");
-    console.log("colorMode: ", colorMode)
-    if (colorMode == "true") {
-      setDarkMode(true);
-    } else {
-      setDarkMode(false);
-    }
-
-    const conversationHistory = localStorage.getItem(LocalStKeys.CONV_HISTORY);
-
-    if (conversationHistory) {
-      setConversations(JSON.parse(conversationHistory));
-    }
-
-    const selectedConversation = localStorage.getItem(LocalStKeys.SELECTED_CONV);
-    if (selectedConversation) {
-      setSelectedConversation(JSON.parse(selectedConversation));
-    } else {
-      setSelectedConversation({
-        id: 1,
-        name: "",
-        messages: []
-      });
-    }
+    useEffectFunc(
+      setDarkMode,
+      setConversations,
+      setSelectedConversation,
+    )
   }, []);
 
   return (

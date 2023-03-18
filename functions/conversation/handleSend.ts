@@ -60,6 +60,7 @@ export const SendConversation = async (
             messages: updatedMessages
         };
         setSelectedConversation(updatedConversation);
+        console.log("updatedConversation id: ", updatedConversation.id)
         localStorage.setItem(LocalStKeys.SELECTED_CONV, JSON.stringify(updatedConversation));
 
         // Update conversation history
@@ -70,8 +71,10 @@ export const SendConversation = async (
         } else {
             currConversationHistory = JSON.parse(ch);
         }
-        let updatedConversationHistory: Conversation[] = [...currConversationHistory, updatedConversation];
-        localStorage.setItem(LocalStKeys.CONV_HISTORY, JSON.stringify(updatedConversationHistory));
+        currConversationHistory[updatedConversation.id] = updatedConversation;
+        localStorage.setItem(LocalStKeys.CONV_HISTORY, JSON.stringify(currConversationHistory));
         setConvActive(false);
+    } else {
+
     }
 };
