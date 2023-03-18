@@ -1,8 +1,8 @@
 import { Conversation } from "@/typings";
 import { IconArrowBarLeft, IconPlus } from "@tabler/icons-react";
 import { FC } from "react";
-import { Conversations } from "./Conversations";
-import { SideNavbarSettings } from "./Settings";
+import { Conversations } from "./ConversationTabs";
+import { SideNavbarSettings } from "./SetThemeButton";
 
 interface Props {
     loading: boolean;
@@ -29,7 +29,7 @@ export const SideNavbar: FC<Props> = ({ loading, conversations, darkMode, select
                         className="ml-4 mr-3"
                         size={16}
                     />
-                    New chat
+                    New Conversation
                 </button>
 
                 <IconArrowBarLeft

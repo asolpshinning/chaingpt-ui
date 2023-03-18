@@ -7,11 +7,12 @@ export const startNewConversation = (
     setModel: (model: LLM) => void,
     setLoading: (loading: boolean) => void
 ) => {
-    const lastConversation = conversations[conversations.length - 1];
+    let lastConversation: Conversation = { id: 0, name: "", messages: [] }
+    if (conversations.length > 0) lastConversation = conversations[conversations.length - 1];
 
     const newConversation: Conversation = {
-        id: lastConversation ? lastConversation.id + 1 : 1,
-        name: "New conversation",
+        id: conversations.length > 0 ? lastConversation.id + 1 : 0,
+        name: "untitled conversation " + (conversations.length > 0 ? lastConversation.id + 1 : 1), // starts from 1 just for rendering and not real id
         messages: []
     };
 

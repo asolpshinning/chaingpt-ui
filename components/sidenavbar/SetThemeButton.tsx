@@ -1,6 +1,6 @@
 import { IconMoon, IconSun } from "@tabler/icons-react";
 import { FC } from "react";
-import { SideNavbarButton } from "./Button";
+import { SideNavbarButton } from "./DivForButton";
 
 interface Props {
     darkMode: boolean;

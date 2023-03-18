@@ -9,17 +9,8 @@ export const SendConversation = async (
     setConvActive: (active: boolean) => void
 
 ) => {
-    if (selectedConversation) {
-        // save user's message to updated conversation
-        let updatedConversation: Conversation = {
-            ...selectedConversation,
-            messages: [...selectedConversation.messages, message]
-        };
 
-        setSelectedConversation(updatedConversation);
-        setLoading(true);
-        setConvActive(true);
-
+    const sendMsgToServer = async (updatedConversation: Conversation) => {
         // send user's message to server
         const BASE_URL = process.env.NEXT_PUBLIC_REACT_APP_SERVER_URL
         const PATH = model === LLM.GPT_3_5 ? '/chat' : '/chat'
@@ -43,27 +34,31 @@ export const SendConversation = async (
         const data = response.json();
 
         if (!data) {
-            return;
+            return null;
         }
 
         setLoading(false);
-
-
+        return data;
+    }
+    //
+    const pushMsgToConversation = (conv: Conversation, data: any) => {
         // push bot's message to current conversation
-        let updatedMessages: ConversationMsg[] = updatedConversation.messages
+        let updatedMessages: ConversationMsg[] = conv.messages
         updatedMessages.push({
             role: "assistant",
-            msg: await data
+            msg: data
         });
-        updatedConversation = {
-            ...updatedConversation,
+        let updatedConv: Conversation = {
+            ...conv,
             messages: updatedMessages
         };
-        setSelectedConversation(updatedConversation);
-        console.log("updatedConversation id: ", updatedConversation.id)
-        localStorage.setItem(LocalStKeys.SELECTED_CONV, JSON.stringify(updatedConversation));
-
-        // Update conversation history
+        setSelectedConversation(updatedConv);
+        console.log("updatedConversation id: ", updatedConv.id)
+        localStorage.setItem(LocalStKeys.SELECTED_CONV, JSON.stringify(updatedConv));
+        return updatedConv
+    }
+    //
+    const updateConversationHistoryWithUpdatedConv = (conv: Conversation) => {
         let currConversationHistory: Conversation[]
         let ch = localStorage.getItem(LocalStKeys.CONV_HISTORY);
         if (!ch) {
@@ -71,10 +66,44 @@ export const SendConversation = async (
         } else {
             currConversationHistory = JSON.parse(ch);
         }
-        currConversationHistory[updatedConversation.id] = updatedConversation;
+        currConversationHistory[conv.id] = conv;
         localStorage.setItem(LocalStKeys.CONV_HISTORY, JSON.stringify(currConversationHistory));
+    }
+
+    // if selected conversation exists in the local storage, update it
+    if (selectedConversation) {
+        // save user's message to updated conversation
+        let updatedConversation: Conversation = {
+            ...selectedConversation,
+            messages: [...selectedConversation.messages, message]
+        };
+
+        setSelectedConversation(updatedConversation);
+        setLoading(true);
+        setConvActive(true);
+
+        // send user's message to server
+        const data = await sendMsgToServer(updatedConversation);
+
+        // push bot's message to current conversation
+        updatedConversation = pushMsgToConversation(updatedConversation, data)
+
+        // Update conversation history
+        updateConversationHistoryWithUpdatedConv(updatedConversation)
+
         setConvActive(false);
+
+
     } else {
+        let newConversation: Conversation = {
+            id: 0,
+            name: "untitled conversation 1",
+            messages: [message]
+        };
+        // send user's message to server
+        const data = await sendMsgToServer(newConversation);
+        // push bot's message to current conversation
+        newConversation = pushMsgToConversation(newConversation, data)
 
     }
 };

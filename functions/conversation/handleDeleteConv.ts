@@ -8,17 +8,13 @@ export const deleteConversation = (
 ) => {
     const updatedConversations = conversations.filter((c) => c.id !== conversation.id);
     setConversations(updatedConversations);
-    localStorage.setItem(LocalStKeys.CONV_HISTORY, JSON.stringify(updatedConversations));
-
     if (updatedConversations.length > 0) {
         setSelectedConversation(updatedConversations[conversation.id - 1]);
         localStorage.setItem(LocalStKeys.SELECTED_CONV, JSON.stringify(updatedConversations[0]));
+        localStorage.setItem(LocalStKeys.CONV_HISTORY, JSON.stringify(updatedConversations));
     } else {
-        setSelectedConversation({
-            id: 0,
-            name: "",
-            messages: []
-        });
+        localStorage.removeItem(LocalStKeys.CONV_HISTORY);
         localStorage.removeItem(LocalStKeys.SELECTED_CONV);
     }
+
 };

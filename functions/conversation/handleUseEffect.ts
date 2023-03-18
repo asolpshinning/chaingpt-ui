@@ -4,6 +4,7 @@ import { Conversation, LocalStKeys } from "@/typings";
 export const useEffectFunc = (
     setDarkMode: (darkMode: boolean) => void,
     setConversations: (conversations: Conversation[]) => void,
+    conversations: Conversation[],
     setSelectedConversation: (conversation: Conversation | undefined) => void
 ) => {
     const colorMode = localStorage.getItem("darkMode");
@@ -18,18 +19,20 @@ export const useEffectFunc = (
 
     if (conversationHistory) {
         setConversations(JSON.parse(conversationHistory));
-    } else {
-        setConversations([]);
-    }
-
-    const selectedConversation = localStorage.getItem(LocalStKeys.SELECTED_CONV);
-    if (selectedConversation) {
-        setSelectedConversation(JSON.parse(selectedConversation));
+        const selectedConversation = localStorage.getItem(LocalStKeys.SELECTED_CONV);
+        if (selectedConversation) {
+            setSelectedConversation(JSON.parse(selectedConversation));
+        } else {
+            setSelectedConversation(conversations[0]);
+        }
     } else {
         setSelectedConversation({
             id: 0,
-            name: "",
+            name: "untitled conversation 1",
             messages: []
         });
+        setConversations([]);
     }
+
+
 }

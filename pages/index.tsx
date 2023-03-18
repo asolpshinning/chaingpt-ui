@@ -51,26 +51,6 @@ export default function Home() {
       setSelectedConversation,
     )
   };
-  /* const handleRenameConversation = (conversation: Conversation, name: string) => {
-    const updatedConversation = {
-      ...conversation,
-      name
-    };
-
-    const updatedConversations = conversations.map((c) => {
-      if (c.id === updatedConversation.id) {
-        return updatedConversation;
-      }
-
-      return c;
-    });
-
-    setConversations(updatedConversations);
-    localStorage.setItem(LocalStKeys.CONV_HISTORY, JSON.stringify(updatedConversations));
-
-    setSelectedConversation(updatedConversation);
-    localStorage.setItem(LocalStKeys.SELECTED_CONV, JSON.stringify(updatedConversation));
-  }; */
 
   //When you start a new conversation
   const handleNewConversation = () => {
@@ -82,25 +62,6 @@ export default function Home() {
       setLoading,
     )
   }
-  /* const handleNewConversation = () => {
-    const lastConversation = conversations[conversations.length - 1];
-
-    const newConversation: Conversation = {
-      id: lastConversation ? lastConversation.id + 1 : 1,
-      name: "New conversation",
-      messages: []
-    };
-
-    const updatedConversations = [...conversations, newConversation];
-    setConversations(updatedConversations);
-    localStorage.setItem(LocalStKeys.CONV_HISTORY, JSON.stringify(updatedConversations));
-
-    setSelectedConversation(newConversation);
-    localStorage.setItem(LocalStKeys.SELECTED_CONV, JSON.stringify(newConversation));
-
-    setModel(LLM.GPT_3_5);
-    setLoading(false);
-  }; */
 
   // When you select a conversation from the sidebar
   const handleSelectConversation = (conversation: Conversation) => {
@@ -117,32 +78,17 @@ export default function Home() {
       setSelectedConversation,
     )
   }
-  /* const handleDeleteConversation = (conversation: Conversation) => {
-    const updatedConversations = conversations.filter((c) => c.id !== conversation.id);
-    setConversations(updatedConversations);
-    localStorage.setItem(LocalStKeys.CONV_HISTORY, JSON.stringify(updatedConversations));
-
-    if (updatedConversations.length > 0) {
-      setSelectedConversation(updatedConversations[0]);
-      localStorage.setItem(LocalStKeys.SELECTED_CONV, JSON.stringify(updatedConversations[0]));
-    } else {
-      setSelectedConversation({
-        id: 1,
-        name: "",
-        messages: []
-      });
-      localStorage.removeItem(LocalStKeys.SELECTED_CONV);
-    }
-  }; */
 
   // When the page loads
   useEffect(() => {
     useEffectFunc(
       setDarkMode,
       setConversations,
+      conversations,
       setSelectedConversation,
     )
   }, []);
+
 
   return (
     <>
