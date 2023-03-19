@@ -5,7 +5,7 @@ export const useEffectFunc = (
     setDarkMode: (darkMode: boolean) => void,
     setConversations: (conversations: Conversation[]) => void,
     conversations: Conversation[],
-    setSelectedConversation: (conversation: Conversation | undefined) => void
+    setSelectedConversation: (conversation: Conversation | undefined) => void,
 ) => {
     const colorMode = localStorage.getItem("darkMode");
     console.log("colorMode: ", colorMode)

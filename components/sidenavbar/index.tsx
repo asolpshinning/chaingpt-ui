@@ -12,12 +12,25 @@ interface Props {
     onNewConversation: () => void;
     onToggledarkMode: (darkMode: boolean) => void;
     onSelectConversation: (conversation: Conversation) => void;
+    setSelectedConversation: (conversation: Conversation) => void;
     onDeleteConversation: (conversation: Conversation) => void;
     onToggleSidebar: () => void;
     onRenameConversation: (conversation: Conversation, name: string) => void;
 }
 
-export const SideNavbar: FC<Props> = ({ loading, conversations, darkMode, selectedConversation, onNewConversation, onToggledarkMode, onSelectConversation, onDeleteConversation, onToggleSidebar, onRenameConversation }) => {
+export const SideNavbar: FC<Props> = ({
+    loading,
+    conversations,
+    darkMode,
+    selectedConversation,
+    onNewConversation,
+    onToggledarkMode,
+    onSelectConversation,
+    setSelectedConversation,
+    onDeleteConversation,
+    onToggleSidebar,
+    onRenameConversation
+}) => {
     return (
         <div className="flex flex-col bg-[#202123] min-w-[260px] max-w-[260px]">
             <div className="flex items-center h-[60px] pl-2">
@@ -45,6 +58,7 @@ export const SideNavbar: FC<Props> = ({ loading, conversations, darkMode, select
                     conversations={conversations}
                     selectedConversation={selectedConversation}
                     onSelectConversation={onSelectConversation}
+                    setSelectedConversation={setSelectedConversation}
                     onDeleteConversation={onDeleteConversation}
                     onRenameConversation={onRenameConversation}
                 />

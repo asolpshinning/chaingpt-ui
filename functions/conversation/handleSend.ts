@@ -1,13 +1,16 @@
 import { Conversation, ConversationMsg, LLM, LocalStKeys } from "@/typings";
+import { useEffectFunc } from "./handleUseEffect";
 
 export const SendConversation = async (
     message: ConversationMsg,
     model: string,
     selectedConversation: Conversation | undefined,
     setSelectedConversation: (conversation: Conversation | undefined) => void,
+    setConversations: (conversations: Conversation[]) => void,
     setLoading: (loading: boolean) => void,
-    setConvActive: (active: boolean) => void
-
+    setConvActive: (active: boolean) => void,
+    setDarkMode: (darkMode: boolean) => void,
+    conversations: Conversation[],
 ) => {
 
     const sendMsgToServer = async (updatedConversation: Conversation) => {
@@ -71,7 +74,7 @@ export const SendConversation = async (
     }
 
     // if selected conversation exists in the local storage, update it
-    if (selectedConversation) {
+    if (selectedConversation && conversations.length > 0) {
         // save user's message to updated conversation
         let updatedConversation: Conversation = {
             ...selectedConversation,
@@ -100,10 +103,24 @@ export const SendConversation = async (
             name: "untitled conversation 1",
             messages: [message]
         };
+        // set conversations on the sidebar to show the new conversation
+        setConversations([newConversation]);
+        setSelectedConversation(newConversation);
+        setLoading(true);
+        setConvActive(true);
         // send user's message to server
         const data = await sendMsgToServer(newConversation);
         // push bot's message to current conversation
         newConversation = pushMsgToConversation(newConversation, data)
-
+        // Update conversation history
+        updateConversationHistoryWithUpdatedConv(newConversation)
+        // set conversations on the sidebar to show the new conversation
+        setConversations([newConversation]);
+        setSelectedConversation(newConversation);
+        setConvActive(false);
+        //useEffect the page since no more conversations
+        setTimeout(() => {
+            useEffectFunc(setDarkMode, setConversations, conversations, setSelectedConversation)
+        }, 1000)
     }
 };

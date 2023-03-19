@@ -4,17 +4,18 @@ import { ConversationInput } from "./ConversationInput";
 import { ConversationLoader } from "./ConversationLoader";
 import { Msg } from "./Msg";
 import { SelectLLM } from "./SelectLLM";
+import { Conversation } from "@/typings";
 
 interface Props {
     model: LLM;
-    messages: ConversationMsg[];
+    conversation: Conversation;
     loading: boolean;
     darkMode: boolean;
     onSend: (message: ConversationMsg) => void;
     onSelect: (model: LLM) => void;
 }
 
-export const ConversationPage: FC<Props> = ({ model, messages, loading, darkMode, onSend, onSelect }) => {
+export const ConversationPage: FC<Props> = ({ model, conversation, loading, darkMode, onSend, onSelect }) => {
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {
@@ -23,12 +24,12 @@ export const ConversationPage: FC<Props> = ({ model, messages, loading, darkMode
 
     useEffect(() => {
         scrollToBottom();
-    }, [messages]);
+    }, [conversation]);
 
     return (
         <div className="h-full w-full flex flex-col dark:bg-[#343541]">
             <div className="flex-1 overflow-auto">
-                {messages.length === 0 ? (
+                {conversation.messages.length === 0 ? (
                     <>
                         <div className="flex justify-center pt-8 overflow-auto">
                             <SelectLLM
@@ -43,7 +44,7 @@ export const ConversationPage: FC<Props> = ({ model, messages, loading, darkMode
                     <>
                         <div className="text-center py-3 dark:bg-[#444654] dark:text-neutral-300 text-neutral-500 text-sm border border-b-neutral-300 dark:border-none">Model: {model}</div>
 
-                        {messages.map((message, index) => (
+                        {conversation.messages.map((message, index) => (
                             <Msg
                                 key={index}
                                 msg={message}

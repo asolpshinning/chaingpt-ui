@@ -6,12 +6,13 @@ interface Props {
     loading: boolean;
     conversations: Conversation[];
     selectedConversation: Conversation;
+    setSelectedConversation: (conversation: Conversation) => void;
     onSelectConversation: (conversation: Conversation) => void;
     onDeleteConversation: (conversation: Conversation) => void;
     onRenameConversation: (conversation: Conversation, name: string) => void;
 }
 
-export const Conversations: FC<Props> = ({ loading, conversations, selectedConversation, onSelectConversation, onDeleteConversation, onRenameConversation }) => {
+export const Conversations: FC<Props> = ({ loading, conversations, selectedConversation, setSelectedConversation, onSelectConversation, onDeleteConversation, onRenameConversation }) => {
     const [isDeleting, setIsDeleting] = useState(false);
     const [isRenaming, setIsRenaming] = useState(false);
     const [renameValue, setRenameValue] = useState("");
@@ -35,7 +36,7 @@ export const Conversations: FC<Props> = ({ loading, conversations, selectedConve
         } else if (isDeleting) {
             setIsRenaming(false);
         }
-    }, [isRenaming, isDeleting]);
+    }, [isRenaming, isDeleting, setSelectedConversation]);
 
     return (
         <div className="flex flex-col space-y-2 w-full px-2">
@@ -43,7 +44,10 @@ export const Conversations: FC<Props> = ({ loading, conversations, selectedConve
                 <button
                     key={index}
                     className={`flex items-center justify-start min-h-[40px] px-2 text-sm rounded-lg hover:bg-neutral-700 cursor-pointer ${loading ? "disabled:cursor-not-allowed" : ""} ${selectedConversation.id === conversation?.id ? "bg-slate-600" : ""}`}
-                    onClick={() => onSelectConversation(conversation)}
+                    onClick={() => {
+                        setSelectedConversation(conversation);
+                        onSelectConversation(conversation)
+                    }}
                     disabled={loading}
                 >
                     <IconMessage

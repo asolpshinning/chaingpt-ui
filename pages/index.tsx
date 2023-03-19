@@ -26,8 +26,11 @@ export default function Home() {
       model,
       selectedConversation,
       setSelectedConversation,
+      setConversations,
       setLoading,
       setConvActive,
+      setDarkMode,
+      conversations,
     )
   };
 
@@ -76,6 +79,7 @@ export default function Home() {
       conversations,
       setConversations,
       setSelectedConversation,
+      setDarkMode,
     )
   }
 
@@ -119,6 +123,7 @@ export default function Home() {
               onToggledarkMode={handleDarkMode}
               onNewConversation={handleNewConversation}
               onSelectConversation={handleSelectConversation}
+              setSelectedConversation={setSelectedConversation}
               onDeleteConversation={handleDeleteConversation}
               onToggleSidebar={() => setShowSidebar(!showSidebar)}
               onRenameConversation={handleRenameConversation}
@@ -133,7 +138,7 @@ export default function Home() {
 
           <ConversationPage
             model={model}
-            messages={selectedConversation.messages}
+            conversation={selectedConversation}
             loading={loading}
             darkMode={darkMode}
             onSend={handleSend}
